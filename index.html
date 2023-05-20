@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<style>
+    input[type="text"], input[type="number"] {
+        margin-bottom: 8px;
+        font-size: 20px;
+    }
+    input[type="submit"] {
+        width: 180px;
+        height: 60px;
+        margin-bottom: 8px;
+        font-size: 20px;
+    }
+    iframe{
+        display: none;
+    }
+</style>
+<div style="text-align: center;">
+    <h3>WiFi</h3>
+    <form action="/wifi" method="POST" target="frame">
+        <input type="text" name="wifi_ssid" placeholder="SSID">
+        <input type="text" name="wifi_pass" placeholder="Password">
+        <br>
+        <input type="submit" value="Save">
+    </form>
+    <br>
+    <h3>MQTT</h3>
+    <form action="/mqtt" method="POST" target="frame">
+        <input type="text" name="mqtt_host" placeholder="Host">
+        <input type="number" name="mqtt_port" placeholder="Port" value="0">
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+    <form action="/exit" method="POST">
+        <input type="submit" value="Reboot">
+    </form>
+    <iframe name="frame"></iframe>
+</div>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="mqttClient">
+    <option name="connectionConfigurations">
+      <list>
+        <ConnectionConfiguration>
+          <option name="caFilePath" value="" />
+          <option name="clientCertificateFilePath" value="" />
+          <option name="clientId" value="mqtt_t1j0eajk" />
+          <option name="clientKeyFilePath" value="" />
+          <option name="connScript">
+            <ConverterScript>
+              <option name="name" value="Custom" />
+              <option name="script" value="## more details see: https://https://github.com/cadeeper/cd-mqtt-client/blob/main/SCRIPT.md&#10;## example: base64.encode('str'), base64.decode('str');&#10;let base64 = require('base64');&#10;## example: hmac.md5Hex('data', 'key'), support functions: md5Hex, sha1Hex, sha224Hex, sha256Hex, sha384Hex, sha512Hex&#10;let hmac = require('hmac');&#10;## example: digest.md5Hex('str'), support functions: md5Hex, md2Hex, sha512Hex, sha384Hex, sha256Hex, sha1Hex&#10;let digest = require('digest');&#10;let base = require('base');&#10;&#10;let username = base64.encode(#{username});&#10;let password = hmac.md5Hex(#{password}, 'secret');&#10;## this will return the replaced username and password&#10;## return base.simpleAuth(username, password);&#10;return base.simpleAuth(#{username}, #{password});" />
+            </ConverterScript>
+          </option>
+          <option name="host" value="mqtt:\\192.168.1.61" />
+          <option name="id" value="e4f6579b-f93b-4c7c-be87-edcf1a078bab" />
+          <option name="lastWillTopic" value="" />
+          <option name="name" value="local" />
+          <option name="username" value="" />
+          <option name="lastWillPayload" value="" />
+        </ConnectionConfiguration>
+        <ConnectionConfiguration>
+          <option name="caFilePath" value="" />
+          <option name="clientCertificateFilePath" value="" />
+          <option name="clientId" value="mqtt_xwn5r88o" />
+          <option name="clientKeyFilePath" value="" />
+          <option name="connScript">
+            <ConverterScript>
+              <option name="name" value="Custom" />
+              <option name="script" value="## more details see: https://https://github.com/cadeeper/cd-mqtt-client/blob/main/SCRIPT.md&#10;## example: base64.encode('str'), base64.decode('str');&#10;let base64 = require('base64');&#10;## example: hmac.md5Hex('data', 'key'), support functions: md5Hex, sha1Hex, sha224Hex, sha256Hex, sha384Hex, sha512Hex&#10;let hmac = require('hmac');&#10;## example: digest.md5Hex('str'), support functions: md5Hex, md2Hex, sha512Hex, sha384Hex, sha256Hex, sha1Hex&#10;let digest = require('digest');&#10;let base = require('base');&#10;&#10;let username = base64.encode(#{username});&#10;let password = hmac.md5Hex(#{password}, 'secret');&#10;## this will return the replaced username and password&#10;## return base.simpleAuth(username, password);&#10;return base.simpleAuth(#{username}, #{password});" />
+            </ConverterScript>
+          </option>
+          <option name="id" value="51960ff4-97f6-42e2-892a-e68eb92871ca" />
+          <option name="lastWillTopic" value="" />
+          <option name="name" value="ggg" />
+          <option name="username" value="" />
+          <option name="lastWillPayload" value="" />
+        </ConnectionConfiguration>
+      </list>
+    </option>
+  </component>
+</project>
