@@ -44,7 +44,7 @@ const char SP_connect_page[] PROGMEM = R"rawliteral(
         <input type="text" name="mqtt_host" placeholder="Host">
         <input type="number" name="mqtt_port" placeholder="Port" value="0">
         <br>
-        <input type="submit" value="Submit">
+        <input type="submit" value="Save">
     </form>
     <form action="/exit" method="POST">
         <input type="submit" value="Reboot">
