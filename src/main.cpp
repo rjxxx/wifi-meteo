@@ -8,10 +8,10 @@
 #include <SimplePortal.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
-#include <GyverNTP.h>
 
 #define MHZ_RX D6
 #define MHZ_TX D7
+
 String MAC = WiFi.macAddress();
 String MQTT_CLIENT_ID = "ESP8266Client-" + MAC;
 uint8_t BUFFER[200];
@@ -23,7 +23,6 @@ unsigned long getDataTimer = 0;
 WiFiClient espClient;
 PubSubClient client(espClient);
 StaticJsonDocument<200> jsonResponse;
-GyverNTP ntp;
 
 void mqttReconnect() {
     while (!client.connected()) {
@@ -52,14 +51,15 @@ void setup() {
 
     //MHZ19
     ss.begin(9600);
-//    mhz19.begin(ss);
+    mhz19.begin(ss);
+    mhz19.autoCalibration();
 
     LittleFS.begin();
 
     if (!loadWifiConfig()) {
         Serial.println("Wifi settings not load");
     }
-    if (!loadMqttConfig()){
+    if (!loadMqttConfig()) {
         Serial.println("Mqtt settings not load");
     }
     if (!wifiConfig.success || !mqttConfig.success) {
@@ -94,8 +94,6 @@ void setup() {
         i++;
     }
     Serial.println("connected");
-    ntp.begin();
-    ntp.updateNow();
 
     client.setServer(mqttConfig.host, mqttConfig.port);
     i = 0;
@@ -120,53 +118,50 @@ void setup() {
 }
 
 void loop() {
-    float temperature = bme.readTemperature();
-    float pressure = pressureToMmHg(bme.readPressure());
-    float humidity = bme.readHumidity();
+    if (millis() - getDataTimer >= 10000) {
+        float temperature = bme.readTemperature();
+        float pressure = pressureToMmHg(bme.readPressure());
+        float humidity = bme.readHumidity();
 
-//    if (millis() - getDataTimer >= 2000) {
-//        int CO2;
-//
-//        CO2 = mhz19.getCO2();                             // Request CO2 (as ppm)
-//
-//        Serial.print("CO2 (ppm): ");
-//        Serial.println(CO2);
-//
-//        float Temp = mhz19.getTemperature();                     // Request Temperature (as Celsius)
-//        Serial.print("Temperature (C): ");
-//        Serial.println(Temp);
-//
-//        getDataTimer = millis();
-//    }
+        int CO2 = mhz19.getCO2();
 
-    Serial.print("Temperature: ");
-    Serial.print(temperature);
-    Serial.println(" *C");
+#ifdef DEBUG
+        float Temp = mhz19.getTemperature();
 
-    Serial.print("Humidity: ");
-    Serial.print(humidity);
-    Serial.println(" %");
+        Serial.print("CO2 (ppm): ");
+        Serial.println(CO2);
 
-    Serial.print("Pressure: ");
-    Serial.print(pressure);
-    Serial.println(" mm Hg");
-    Serial.println("");
+        Serial.print("Temperature (mhz19): ");
+        Serial.println(Temp);
 
-    if (!client.connected()) {
-        mqttReconnect();
+        Serial.print("Temperature: ");
+        Serial.print(temperature);
+        Serial.println(" *C");
+
+        Serial.print("Humidity: ");
+        Serial.print(humidity);
+        Serial.println(" %");
+
+        Serial.print("Pressure: ");
+        Serial.print(pressure);
+        Serial.println(" mm Hg");
+        Serial.println("");
+#endif
+        if (!client.connected()) {
+            mqttReconnect();
+        }
+        client.loop();
+
+        jsonResponse["sensorId"] = MAC;
+        jsonResponse["sensorData"]["temperature"] = temperature;
+        jsonResponse["sensorData"]["humidity"] = humidity;
+        jsonResponse["sensorData"]["pressure"] = pressure;
+        jsonResponse["sensorData"]["co2"] = CO2;
+
+        size_t bytesWritten = serializeJson(jsonResponse, BUFFER);
+        client.publish("weather", BUFFER, bytesWritten);
+
+        getDataTimer = millis();
     }
-    client.loop();
 
-    ntp.tick();
-
-    jsonResponse["sensorId"] = MAC;
-    jsonResponse["sensorData"]["temperature"] = temperature;
-    jsonResponse["sensorData"]["humidity"] = humidity;
-    jsonResponse["sensorData"]["pressure"] = pressure;
-    jsonResponse["datetime"] = ntp.unix();
-
-    size_t bytesWritten = serializeJson(jsonResponse, BUFFER);
-    client.publish("weather", BUFFER, bytesWritten);
-
-    delay(10000);
 }
