@@ -69,19 +69,26 @@ void setup()
 
     LittleFS.begin();
 
-    // if (!loadWifiConfig())
-    // {
-    //     Serial.println("Wifi settings not load");
-    // }
-    // if (!loadMqttConfig())
-    // {
-    //     Serial.println("Mqtt settings not load");
-    // }
-    // if (!wifiConfig.success || !mqttConfig.success)
-    // {
-    //     Serial.println("Start portal");
-    //     portalStart();
-    // }
+    portalRun();  // запустить с таймаутом 60с
+  
+    Serial.println(portalStatus());
+    // статус: 0 error, 1 connect, 2 ap, 3 local, 4 exit, 5 timeout
+  
+    
+    if (!loadWifiConfig())
+    {
+        Serial.println("Wifi settings not load");
+    }
+    if (!loadMqttConfig())
+    {
+        Serial.println("Mqtt settings not load");
+    }
+
+    if (!wifiConfig.success || !mqttConfig.success)
+     {
+        Serial.println("Start portal");
+        portalStart();
+    }
 
     WiFi.softAPdisconnect();
     WiFi.disconnect();
@@ -113,7 +120,8 @@ void setup()
     }
     Serial.println("connected");
 
-    client.setServer("192.168.1.61", 1883);
+    client.setServer(mqttConfig.host, mqttConfig.port);
+    
     i = 0;
     while (!client.connected())
     {

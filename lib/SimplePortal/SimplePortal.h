@@ -52,6 +52,8 @@ void portalStart();
 
 void portalStop();
 
+void portalRun();
+
 byte portalStatus();
 
 bool loadWifiConfig();

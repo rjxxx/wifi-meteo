@@ -5,7 +5,7 @@ static DNSServer SP_dnsServer;
 #ifdef ESP8266
 static ESP8266WebServer SP_server(80);
 #else
-static WebServer _SP_server(80);
+static WebServer SP_server(80);
 #endif
 
 const char SP_connect_page[] PROGMEM = R"rawliteral(
@@ -55,6 +55,7 @@ const char SP_connect_page[] PROGMEM = R"rawliteral(
 </html>)rawliteral";
 
 static byte SP_status = 0;
+static bool SP_started = false;
 WifiConfig wifiConfig;
 MqttConfig mqttConfig;
 
@@ -115,7 +116,7 @@ void SP_handleExit() {
     SP_status = SP_EXIT;
 }
 
-void start() {
+void portalStart() {
     WiFi.softAPdisconnect();
     WiFi.disconnect();
     IPAddress apIP(SP_AP_IP);
@@ -132,6 +133,7 @@ void start() {
     SP_server.on("/mqtt", HTTP_POST, SP_handleSaveMqtt);
     SP_server.on("/exit", HTTP_POST, SP_handleExit);
     SP_server.begin();
+    SP_started = true;
     SP_status = SP_RUN;
 }
 
@@ -140,14 +142,33 @@ void portalStop() {
     SP_server.stop();
     SP_dnsServer.stop();
     SP_status = SP_EXIT;
+    SP_started = false;
 }
 
-void portalStart() {
-    start();
-    while (SP_status != SP_EXIT) {
-        SP_dnsServer.processNextRequest();
-        SP_server.handleClient();
+bool portalTick() {
+  if (SP_started) {
+    SP_dnsServer.processNextRequest();
+    SP_server.handleClient();
+    yield();
+    if (SP_status) {
+      portalStop();
+      return 1;
     }
+  }
+  return 0;
+}
+
+void portalRun(uint32_t prd) {
+  uint32_t tmr = millis();
+  portalStart();
+  while (!portalTick()) {
+    if (millis() - tmr > prd) {
+      SP_status = 5;
+      portalStop();
+      break;
+    }
+    yield();
+  }
 }
 
 byte portalStatus() {
